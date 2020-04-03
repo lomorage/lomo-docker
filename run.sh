@@ -20,7 +20,8 @@ Command line options:
     -d              Debug mode to run in foreground, default to $DEBUG, optional
 
 Examples:
-    ./run.sh -m /Users/jeromy/Downloads/docker/lomorage/media -b /Users/jeromy/Downloads/docker/lomorage/lomo -h 192.168.1.232 -i lomorage
+    # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
+    ./run.sh -m /media -b /home/pi/lomorage -h 192.168.1.232
 '
 
 function help() {
