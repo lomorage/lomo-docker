@@ -50,17 +50,17 @@ You can specify the media home directory and lomo directory, otherwise it will u
 run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port}] -h host-ip -i image-name
 
 Command line options:
-    -m  DIR         Absolute path of media directory used for media assets, default to $HOME_MEDIA_DIR, optional
-    -b  DIR         Absolute path of lomo directory used for db and log files, default to $HOME_LOMO_DIR, optional
+    -m  DIR         Absolute path of media directory used for media assets, default to "/media", optional
+    -b  DIR         Absolute path of lomo directory used for db and log files, default to "/home/pi/lomo", optional
     -h  HOST        IP address or hostname of the host machine, required
-    -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to $LOMOD_HOST_PORT, optional
-    -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to $LOMOW_HOST_PORT, optional
-    -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", required
-    -d              Debug mode to run in foreground, default to $DEBUG, optional
+    -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to "8000", optional
+    -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to "8001", optional
+    -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", default "lomorage/raspberrypi-lomorage:latest", optional
+    -d              Debug mode to run in foreground, default to 0, optional
 
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
-    ./run.sh -m /media -b /home/pi/lomorage -h 192.168.1.232
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232
 ```
 
 # Update dockerhub
