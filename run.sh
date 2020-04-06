@@ -93,7 +93,7 @@ mkdir -p "$HOME_MEDIA_DIR"
 mkdir -p "$HOME_LOMO_DIR"
 
 if [ $DEBUG -eq 0 ]; then
-    docker run -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    docker run --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
 else
-    docker run -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    docker run --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
 fi
