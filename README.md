@@ -39,7 +39,7 @@ sudo docker pull lomorage/raspberrypi-lomorage:latest
 ## Build by your self
 
 ```
-docker build -t lomorage/raspberrypi-lomorage .
+docker build --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/raspberrypi-lomorage .
 ```
 
 # Run
