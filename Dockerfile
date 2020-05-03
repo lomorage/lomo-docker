@@ -11,7 +11,7 @@ RUN apt-get update && apt-get -qy install lomo-vips
 
 RUN apt-get update && apt-get -qy install lomo-base
 
-RUN apt-get update && apt-get -qy install lomo-backend-beta
+RUN apt-get update && apt-get -qy install lomo-backend
 
 RUN apt-get update && apt-get -qy install lomo-web
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
