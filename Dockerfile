@@ -9,7 +9,7 @@ RUN echo "deb https://lomoware.github.io/debian/buster buster main" | sudo tee /
 
 RUN apt-get update && apt-get -qy install lomo-vips
 
-RUN apt-get update && apt-get -qy install lomo-base
+RUN apt-get update && apt-get -qy install nfs-common ffmpeg util-linux rsync jq libimage-exiftool-perl avahi-utils avahi-daemon
 
 RUN apt-get update && apt-get -qy install lomo-backend-docker
 
