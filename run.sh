@@ -30,7 +30,7 @@ function help() {
     exit 3;
 }
 
-OPTIONS=m:,b:,h:,i:,d
+OPTIONS=m:,b:,h:,i:,p:,P:,d
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
     echo "getopt error"
