@@ -1,5 +1,4 @@
 #! /bin/bash
-set -e
 
 DEBUG=0
 HOME_MEDIA_DIR=/media
@@ -14,6 +13,10 @@ Command line options:
     -m  DIR         Absolute path of media directory used for media assets, default to \"$HOME_MEDIA_DIR\", optional
     -b  DIR         Absolute path of lomo directory used for db and log files, default to \"$HOME_LOMO_DIR\", optional
     -h  HOST        IP address or hostname of the host machine, required
+    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required
+    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required
+    -n  NETWORK_INF network interface of the host network(like eth0), required
+    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to \"$LOMOD_HOST_PORT\", optional
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to \"$LOMOW_HOST_PORT\", optional
     -i  IMAGE_NAME  docker image name, for example \"lomorage/raspberrypi-lomorage:[tag]\", default \"$IMAGE_NAME\", optional
@@ -21,16 +24,23 @@ Command line options:
 
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
-    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232 -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -a 192.168.1.99
 "
 
 function help() {
-    echo "`basename $0` [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -h host"
+    echo "`basename $0` [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -h host -s subnet -g gateway -n network-interface -a vlan-address"
     echo "$COMMAND_LINE_OPTIONS_HELP"
     exit 3;
 }
 
-OPTIONS=m:,b:,h:,i:,p:,P:,d
+function createIpVlan() {
+    sudo docker network ls | grep "lomorage"
+    if [ $? -ne 0 ]; then
+        sudo docker network create -d ipvlan -o ipvlan_mode=l2 --subnet=$1 --gateway=$2 -o parent=$3 lomorage
+    fi
+}
+
+OPTIONS=m:,b:,h:,i:,p:,P:,s:,g:,n:,a:,d
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
     echo "getopt error"
@@ -61,6 +71,22 @@ while true; do
             IMAGE_NAME=$2
             shift 2
             ;;
+        -s)
+            SUBNET=$2
+            shift 2
+            ;;
+        -g)
+            GATEWAY=$2
+            shift 2
+            ;;
+        -n)
+            NETWORK_INF=$2
+            shift 2
+            ;;
+        -a)
+            VLAN_ADDR=$2
+            shift 2
+            ;;
         -d)
             DEBUG=1
             shift
@@ -81,9 +107,18 @@ while true; do
 done
 
 [ -z "$HOST" ] && echo "Host required!" && help
+[ -z "$SUBNET" ] && echo "Subnet required!" && help
+[ -z "$GATEWAY" ] && echo "Gateway required!" && help
+[ -z "$NETWORK_INF" ] && echo "Network interface required!" && help
+[ -z "$VLAN_ADDR" ] && echo "Vlan address required!" && help
 [ -z "$IMAGE_NAME" ] && echo "Docker image name required!" && help
 
 echo "Host: $HOST"
+echo "Subnet: $SUBNET"
+echo "GATEWAY: $GATEWAY"
+echo "Network Interface: $NETWORK_INF"
+echo "Vlan address: $VLAN_ADDR"
+
 echo "lomo-backend host port: $LOMOW_HOST_PORT"
 echo "lomo-web host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
@@ -92,8 +127,10 @@ echo "Lomo directory: $HOME_LOMO_DIR"
 mkdir -p "$HOME_MEDIA_DIR"
 mkdir -p "$HOME_LOMO_DIR"
 
+createIpVlan $SUBNET $GATEWAY $NETWORK_INF
+
 if [ $DEBUG -eq 0 ]; then
-    docker run --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    sudo docker run --net lomorage --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
 else
-    docker run --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    sudo docker run --net lomorage --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
 fi

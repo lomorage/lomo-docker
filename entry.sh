@@ -10,8 +10,5 @@ fi
 
 cron && tail -f /var/log/cron.log &
 
-while true
-do
-    /opt/lomorage/bin/lomo-web --port 8001 --baseurl http://$1:8000 &
-    /opt/lomorage/bin/lomod -b /lomo --max-upload 1 --max-fetch-preview 3
-done
+/opt/lomorage/bin/lomo-web --port 8001 --baseurl http://$1:8000 &
+/opt/lomorage/bin/lomod -b /lomo --max-upload 1 --max-fetch-preview 3

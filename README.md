@@ -47,12 +47,16 @@ docker build --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/raspberrypi-
 You can specify the media home directory and lomo directory, otherwise it will use the default, you **MUST** specify the host.
 
 ```
-run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port}] -h host-ip -i image-name
+run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -h host -s subnt -g gateway -n network-interface -a vlan-address
 
 Command line options:
     -m  DIR         Absolute path of media directory used for media assets, default to "/media", optional
-    -b  DIR         Absolute path of lomo directory used for db and log files, default to "/home/pi/lomo", optional
+    -b  DIR         Absolute path of lomo directory used for db and log files, default to "/home/jeromy/lomo", optional
     -h  HOST        IP address or hostname of the host machine, required
+    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required
+    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required
+    -n  NETWORK_INF network interface of the host network(like eth0), required
+    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to "8000", optional
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to "8001", optional
     -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", default "lomorage/raspberrypi-lomorage:latest", optional
@@ -60,7 +64,7 @@ Command line options:
 
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
-    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232 -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -a 192.168.1.99
 ```
 
 # Update dockerhub
