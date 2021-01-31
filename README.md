@@ -32,14 +32,26 @@ You can either pull docker image from docker hub, or build yourself.
 
 ## Pull from docker hub
 
+If using arm:
+
 ```
 sudo docker pull lomorage/raspberrypi-lomorage:latest
+```
+
+If using x86/amd64:
+
+```
+sudo docker pull lomorage/amd64-lomorage:latest
 ```
 
 ## Build by your self
 
 ```
-docker build --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/raspberrypi-lomorage .
+# build for arm
+sudo docker build --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/raspberrypi-lomorage .
+
+# build for x86/amd64
+sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/amd64-lomorage .
 ```
 
 # Run
@@ -71,7 +83,16 @@ Examples:
 
 Retag and then push:
 
+arm:
+
 ```
-docker tag lomorage lomorage/raspberrypi-lomorage:latest
-docker push lomorage/raspberrypi-lomorage:latest
+sudo docker tag lomorage/raspberrypi-lomorage:latest lomorage/raspberrypi-lomorage:latest
+sudo docker push lomorage/raspberrypi-lomorage:latest
+```
+
+x86/amd64:
+
+```
+sudo docker tag lomorage/amd64-lomorage:latest lomorage/amd64-lomorage:latest
+sudo docker push lomorage/raspberrypi-amd64:latest
 ```
