@@ -74,6 +74,8 @@ Examples:
     ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232 -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -a 192.168.1.99
 ```
 
+You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
+
 # Update dockerhub
 
 Retag and then push:
