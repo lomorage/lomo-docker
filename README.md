@@ -6,13 +6,9 @@
 - [Run](#run)
 - [Update dockerhub](#update-dockerhub)
 
-You can use the docker image to install Lomorage on your existing Raspberry Pi setup.
-
-Raspberry Pi zero and 1 **NOT** supported now.
-
-**MDNS doesn't work in this case, so the phone APP won't be able to find the service automatically. You have to input host and port manually**
-
 # Install docker
+
+Please follow [instruction](https://docs.docker.com/engine/install/) on docker offical site to install docker
 
 note: If you are using OMSC, you probably need to change "id=osmc" in /etc/os-release to "id=raspbain"
 
@@ -24,7 +20,6 @@ sudo usermod -aG docker $USER
 sudo systemctl start docker
 sudo docker info
 ```
-
 
 # Get docker image
 
