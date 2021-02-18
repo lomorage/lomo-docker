@@ -54,7 +54,7 @@ sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive
 You can specify the media home directory and lomo directory, otherwise it will use the default, you **MUST** specify the host.
 
 ```
-run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -h host -s subnt -g gateway -n network-interface -a vlan-address
+run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -h host -s subnet -g gateway -n network-interface -a vlan-address
 
 Command line options:
     -m  DIR         Absolute path of media directory used for media assets, default to "/media", optional
@@ -63,6 +63,7 @@ Command line options:
     -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required
     -g  GATEWAY     gateway of the host network(like 192.168.1.1), required
     -n  NETWORK_INF network interface of the host network(like eth0), required
+    -t  VLAN_TYPE   vlan type, can be "macvlan" or "ipvlan"
     -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to "8000", optional
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to "8001", optional
@@ -71,7 +72,7 @@ Command line options:
 
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
-    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232 -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -a 192.168.1.99
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.232 -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -t macvlan -a 192.168.1.99
 ```
 
 You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
