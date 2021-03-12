@@ -16,7 +16,7 @@ RUN apt-get update && apt-get -qy install lomo-backend-docker
 RUN apt-get update && apt-get -qy install lomo-web
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
-RUN apt-get update && apt-get -qy install cron psmisc
+RUN apt-get update && apt-get -qy install cron psmisc net-tools iproute2
 COPY update-lomod.sh /usr/bin/update-lomod.sh
 COPY update-lomod-cron /etc/cron.d/update-lomod-cron
 RUN crontab /etc/cron.d/update-lomod-cron
