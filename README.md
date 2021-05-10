@@ -91,5 +91,5 @@ x86/amd64:
 
 ```
 sudo docker tag lomorage/amd64-lomorage:latest lomorage/amd64-lomorage:latest
-sudo docker push lomorage/raspberrypi-amd64:latest
+sudo docker push lomorage/amd64-lomorage:latest
 ```
