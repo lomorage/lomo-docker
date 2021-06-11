@@ -9,14 +9,19 @@ IMAGE_NAME="lomorage/raspberrypi-lomorage:latest"
 VLAN_NAME="lomorage"
 
 COMMAND_LINE_OPTIONS_HELP="
+
+You can use either use macvlan or ipvlan which makes MDNS service discovery work.
+But macvlan and ipvlan are only support on Linux, so if you are on Windows or Mac, you can't use it.
+
 Command line options:
     -m  DIR         Absolute path of media directory used for media assets, default to \"$HOME_MEDIA_DIR\", optional
     -b  DIR         Absolute path of lomo directory used for db and log files, default to \"$HOME_LOMO_DIR\", optional
-    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required
-    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required
-    -n  NETWORK_INF network interface of the host network(like eth0), required
-    -t  VLAN_TYPE   vlan type, can be \"macvlan\" or \"ipvlan\", required
-    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required
+    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required when using vlan
+    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required when using vlan
+    -n  NETWORK_INF network interface of the host network(like eth0), required when using vlan
+    -t  VLAN_TYPE   vlan type, can be \"macvlan\" or \"ipvlan\", required when using vlan
+    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required when using vlan
+    -h  HOST        IP address or hostname of the host machine, required when NOT using vlan
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to \"$LOMOD_HOST_PORT\", optional
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to \"$LOMOW_HOST_PORT\", optional
     -i  IMAGE_NAME  docker image name, for example \"lomorage/raspberrypi-lomorage:[tag]\", default \"$IMAGE_NAME\", optional
@@ -25,6 +30,9 @@ Command line options:
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
     ./run.sh -m /media -b /home/pi/lomo -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -t macvlan -a 192.168.1.99
+
+    # or if you don't use vlan
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.99
 "
 
 function help() {
@@ -53,7 +61,7 @@ function abspath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
-OPTIONS=m:,b:,i:,p:,P:,s:,g:,n:,a:,t:,d
+OPTIONS=m:,b:,i:,p:,P:,s:,g:,n:,a:,t:,h:d
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
     echo "getopt error"
@@ -108,6 +116,10 @@ while true; do
             DEBUG=1
             shift
             ;;
+        -h)
+            HOST=$2
+            shift 2
+            ;;
         --)
             shift
             break
@@ -119,41 +131,52 @@ while true; do
     esac
 done
 
-[ -z "$SUBNET" ] && echo "Subnet required!" && help
-[ -z "$GATEWAY" ] && echo "Gateway required!" && help
-[ -z "$VLAN_TYPE" ] && echo "Vlan type required!" && help
-[ -z "$NETWORK_INF" ] && echo "Network interface required!" && help
-[ -z "$VLAN_ADDR" ] && echo "Vlan address required!" && help
 [ -z "$IMAGE_NAME" ] && echo "Docker image name required!" && help
 
-if [ "$VLAN_TYPE" != "ipvlan" ] && [ "$VLAN_TYPE" != "macvlan" ]; then
-    echo "vlan type should either be \"ipvlan\" or \"macvlan\""
+if [ "$VLAN_TYPE" != "ipvlan" ] && [ "$VLAN_TYPE" != "macvlan" ] && [ ! -z "$VLAN_TYPE" ]; then
+    echo "vlan type should either be \"ipvlan\" or \"macvlan\" or empty"
     help
 fi
-
-echo "Subnet: $SUBNET"
-echo "GATEWAY: $GATEWAY"
-echo "Network Interface: $NETWORK_INF"
-echo "Vlan address: $VLAN_ADDR"
-echo "Vlan type: $VLAN_TYPE"
 
 echo "lomo-backend host port: $LOMOW_HOST_PORT"
 echo "lomo-web host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
 
-mkdir -p "$HOME_MEDIA_DIR"
-mkdir -p "$HOME_LOMO_DIR"
+if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
+    [ -z "$SUBNET" ] && echo "Subnet required!" && help
+    [ -z "$GATEWAY" ] && echo "Gateway required!" && help
+    [ -z "$NETWORK_INF" ] && echo "Network interface required!" && help
+    [ -z "$VLAN_ADDR" ] && echo "Vlan address required!" && help
+    echo "Subnet: $SUBNET"
+    echo "GATEWAY: $GATEWAY"
+    echo "Network Interface: $NETWORK_INF"
+    echo "Vlan address: $VLAN_ADDR"
+    echo "Vlan type: $VLAN_TYPE"
+    if [ "$VLAN_TYPE" == "ipvlan" ]; then
+        createIpVlan $SUBNET $GATEWAY $NETWORK_INF
+    else
+        createMacVlan $SUBNET $GATEWAY $NETWORK_INF
+    fi
 
-if [ "$VLAN_TYPE" == "ipvlan" ]; then
-    createIpVlan $SUBNET $GATEWAY $NETWORK_INF
+    mkdir -p "$HOME_MEDIA_DIR"
+    mkdir -p "$HOME_LOMO_DIR"
+
+    if [ $DEBUG -eq 0 ]; then
+        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR
+    else
+        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR
+    fi
 else
-    createMacVlan $SUBNET $GATEWAY $NETWORK_INF
-fi
+    [ -z "$HOST" ] && echo "Host required!" && help
+    echo "Host: $HOST"
 
+    mkdir -p "$HOME_MEDIA_DIR"
+    mkdir -p "$HOME_LOMO_DIR"
 
-if [ $DEBUG -eq 0 ]; then
-    sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR
-else
-    sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR
+    if [ $DEBUG -eq 0 ]; then
+        docker run --user=$UID:$(id -g $USER) -d -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    else
+        docker run --user=$UID:$(id -g $USER) -p $LOMOD_HOST_PORT:8000 -p $LOMOW_HOST_PORT:8001 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $HOST
+    fi
 fi

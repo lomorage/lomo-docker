@@ -51,19 +51,24 @@ sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive
 
 # Run
 
-You can specify the media home directory and lomo directory, otherwise it will use the default, you **MUST** specify the host.
+You can specify the media home directory and lomo directory(**make sure to use absolute directory here**), otherwise it will use the default, you **MUST** specify the host.
 
 ```
 run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -t vlan-type -s subnet -g gateway -n network-interface -a vlan-address
 
+
+You can use either use macvlan or ipvlan which makes MDNS service discovery work.
+But macvlan and ipvlan are only support on Linux, so if you are on Windows or Mac, you can't use it.
+
 Command line options:
     -m  DIR         Absolute path of media directory used for media assets, default to "/media", optional
     -b  DIR         Absolute path of lomo directory used for db and log files, default to "/home/jeromy/lomo", optional
-    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required
-    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required
-    -n  NETWORK_INF network interface of the host network(like eth0), required
-    -t  VLAN_TYPE   vlan type, can be "macvlan" or "ipvlan", required
-    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required
+    -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required when using vlan
+    -g  GATEWAY     gateway of the host network(like 192.168.1.1), required when using vlan
+    -n  NETWORK_INF network interface of the host network(like eth0), required when using vlan
+    -t  VLAN_TYPE   vlan type, can be "macvlan" or "ipvlan", required when using vlan
+    -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required when using vlan
+    -h  HOST        IP address or hostname of the host machine, required when NOT using vlan
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to "8000", optional
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to "8001", optional
     -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", default "lomorage/raspberrypi-lomorage:latest", optional
@@ -72,6 +77,9 @@ Command line options:
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
     ./run.sh -m /media -b /home/pi/lomo -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -t macvlan -a 192.168.1.99
+
+    # or if you don't use vlan
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.99
 ```
 
 You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
@@ -91,5 +99,5 @@ x86/amd64:
 
 ```
 sudo docker tag lomorage/amd64-lomorage:latest lomorage/amd64-lomorage:latest
-sudo docker push lomorage/raspberrypi-amd64:latest
+sudo docker push lomorage/amd64-lomorage:latest
 ```
