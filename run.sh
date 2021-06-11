@@ -49,6 +49,10 @@ function createMacVlan() {
     sudo docker network create -d macvlan --subnet=$1 --gateway=$2 -o parent=$3 $VLAN_NAME
 }
 
+function abspath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 OPTIONS=m:,b:,i:,p:,P:,s:,g:,n:,a:,t:,d
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
@@ -61,11 +65,11 @@ eval set -- "$PARSED"
 while true; do
     case "$1" in
         -m)
-            HOME_MEDIA_DIR=$2
+            HOME_MEDIA_DIR=$(abspath $2)
             shift 2
             ;;
         -b)
-            HOME_LOMO_DIR=$2
+            HOME_LOMO_DIR=$(abspath $2)
             shift 2
             ;;
         -p)

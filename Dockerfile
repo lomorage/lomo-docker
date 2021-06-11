@@ -23,4 +23,5 @@ RUN crontab /etc/cron.d/update-lomod-cron
 RUN touch /var/log/cron.log
 
 COPY entry.sh /usr/bin/entry.sh
-CMD ["/bin/bash", "/usr/bin/entry.sh"]
+
+CMD cron && tail -f /var/log/cron.log && /usr/bin/entry.sh
