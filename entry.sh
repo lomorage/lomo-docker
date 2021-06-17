@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-/usr/bin/update-lomod.sh
+#/usr/bin/update-lomod.sh
 
 /opt/lomorage/bin/lomo-web --port 8001 --baseurl http://$1:8000 &
 /opt/lomorage/bin/lomod -b /lomo --max-upload 1 --max-fetch-preview 3
