@@ -10,5 +10,9 @@ fi
 
 #/usr/bin/update-lomod.sh
 
-/opt/lomorage/bin/lomo-web --port 8001 --baseurl http://$1:8000 &
-/opt/lomorage/bin/lomod -b /lomo --max-upload 1 --max-fetch-preview 3
+HOST=$1
+LOMOD_PORT=$2
+LOMOW_PORT=$3
+
+/opt/lomorage/bin/lomo-web --port $LOMOW_PORT --baseurl http://$HOST:$LOMOD_PORT &
+/opt/lomorage/bin/lomod -p $LOMOD_PORT -b /lomo --max-upload 1 --max-fetch-preview 3
