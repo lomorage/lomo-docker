@@ -163,9 +163,9 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
     else
-        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
     fi
 else
     [ -z "$HOST" ] && echo "Host required!" && help
@@ -175,8 +175,8 @@ else
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+        sudo docker run --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
     else
-        sudo docker run --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+        sudo docker run --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
     fi
 fi
