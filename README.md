@@ -54,7 +54,7 @@ sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive
 You can specify the media home directory and lomo directory(**make sure to use absolute directory here**), otherwise it will use the default, you **MUST** specify the host.
 
 ```
-run.sh [-m {media-dir} -b {lomo-dir} -d -p {lomod-port} -P {lomow-port} -i {image-name}] -t vlan-type -s subnet -g gateway -n network-interface -a vlan-address
+run.sh [-m {media-dir} -b {lomo-dir} -d -u -p {lomod-port} -P {lomow-port} -i {image-name}] -t vlan-type -s subnet -g gateway -n network-interface -a vlan-address
 
 
 You can use either use macvlan or ipvlan which makes MDNS service discovery work.
@@ -73,13 +73,14 @@ Command line options:
     -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to "8001", optional
     -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", default "lomorage/raspberrypi-lomorage:latest", optional
     -d              Debug mode to run in foreground, default to 0, optional
+    -u              Auto upgrade lomorage docker images, default to 0, optional
 
 Examples:
     # assuming your hard drive mounted in /media, like /media/usb0, /media/usb0
-    ./run.sh -m /media -b /home/pi/lomo -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -t macvlan -a 192.168.1.99
+    ./run.sh -m /media -b /home/pi/lomo -s 192.168.1.0/24 -g 192.168.1.1 -n eth0 -t macvlan -a 192.168.1.99 -u
 
     # or if you don't use vlan
-    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.99
+    ./run.sh -m /media -b /home/pi/lomo -h 192.168.1.99 -u
 ```
 
 You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
