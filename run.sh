@@ -143,6 +143,8 @@ echo "lomo-web host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
 
+sudo docker run -d --name watchtower -v /var/run/docker.sock:/var/run/docker.sock --rm containrrr/watchtower
+
 if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
     [ -z "$SUBNET" ] && echo "Subnet required!" && help
     [ -z "$GATEWAY" ] && echo "Gateway required!" && help
