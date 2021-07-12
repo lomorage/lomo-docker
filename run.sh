@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -x
+
 DEBUG=0
 AUTOUPDATE=0
 HOME_MEDIA_DIR=/media
