@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  lomo:
+    image: ${IMG}
+    container_name: lomorage
+    privileged: true
+    cap_add:
+      - ALL
+    volumes:
+      - ${HOME_MEDIA_DIR}:/media
+      - ${HOME_LOMO_DIR}:/lomo
+      - /dev:/dev
+    ports:
+      - ${LOMOD_PORT}:${LOMOD_PORT}
+      - ${LOMOW_PORT}:${LOMOW_PORT}
+    networks:
+      lomorage:
+        ipv4_address: ${VLAN_ADDR}
+    command: $VLAN_ADDR $LOMOD_PORT $LOMOW_PORT
+
+  watchtower:
+    image: ${AUTO_UPDATE_IMG}
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: lomorage --cleanup
+
+networks:
+  lomorage:
+    driver: ${NETWORK_TYPE}
+    driver_opts:
+      parent: ${NETWORK_INF}
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

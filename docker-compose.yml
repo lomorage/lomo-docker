@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  lomo:
+    image: ${IMG}
+    container_name: lomorage
+    privileged: true
+    cap_add:
+      - ALL
+    volumes:
+      - ${HOME_MEDIA_DIR}:/media
+      - ${HOME_LOMO_DIR}:/lomo
+      - /dev:/dev
+    ports:
+      - ${LOMOD_PORT}:${LOMOD_PORT}
+      - ${LOMOW_PORT}:${LOMOW_PORT}
+    command: $HOST_ADDR $LOMOD_PORT $LOMOW_PORT
+
+  watchtower:
+    image: ${AUTO_UPDATE_IMG}
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: lomorage --cleanup

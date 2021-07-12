@@ -51,6 +51,10 @@ sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive
 
 # Run
 
+You have two options:
+
+## Option 1
+
 You can specify the media home directory and lomo directory(**make sure to use absolute directory here**), otherwise it will use the default, you **MUST** specify the host.
 
 ```
@@ -84,6 +88,19 @@ Examples:
 ```
 
 You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
+
+## Option 2
+
+You can use docker compose, if you are on OSX or Windows, use "[docker-compose.yml](docker-compose.yml)", if you are on Linux, you can use "[docker-compose.vlan.yml](docker-compose.vlan.yml)" with which MDNS works.
+Make sure to modify "[.env](.env)" in your env.
+
+```
+# on OSX or Windows
+docker-compose up
+
+# on Linux
+sudo docker-compose -f docker-compose.vlan.yml up
+```
 
 # Update dockerhub
 
