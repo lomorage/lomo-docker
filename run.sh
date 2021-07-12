@@ -7,6 +7,7 @@ HOME_LOMO_DIR=/home/"$USER"/lomo
 LOMOD_HOST_PORT=8000
 LOMOW_HOST_PORT=8001
 IMAGE_NAME="lomorage/raspberrypi-lomorage:latest"
+AUTO_UPDATE_IMG="containrrr/watchtower:armhf-latest"
 VLAN_NAME="lomorage"
 
 COMMAND_LINE_OPTIONS_HELP="
@@ -149,8 +150,12 @@ echo "lomo-web host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
 
+if [ "$IMAGE_NAME" != "lomorage/raspberrypi-lomorage:latest" ]; then
+    AUTO_UPDATE_IMG="containrrr/watchtower"
+fi
+
 if [ $AUTOUPDATE -eq 1 ]; then
-   sudo docker run -d --name watchtower -v /var/run/docker.sock:/var/run/docker.sock --rm containrrr/watchtower lomorage
+   sudo docker run -d --name watchtower -v /var/run/docker.sock:/var/run/docker.sock --rm $AUTO_UPDATE_IMG lomorage --cleanup
 fi
 
 if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
