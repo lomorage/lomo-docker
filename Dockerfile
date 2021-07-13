@@ -24,5 +24,4 @@ RUN touch /var/log/cron.log
 
 COPY entry.sh /usr/bin/entry.sh
 
-#CMD cron && tail -f /var/log/cron.log && /usr/bin/entry.sh
-CMD /usr/bin/entry.sh
+ENTRYPOINT ["/usr/bin/entry.sh"]
