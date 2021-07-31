@@ -43,10 +43,10 @@ sudo docker pull lomorage/amd64-lomorage:latest
 
 ```
 # build for arm
-sudo docker build --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/raspberrypi-lomorage .
+sudo docker build --build-arg DEBIAN_FRONTEND=noninteractive --build-arg DUMMY=`date +%s` -t lomorage/raspberrypi-lomorage .
 
 # build for x86/amd64
-sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive -t lomorage/amd64-lomorage .
+sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive --build-arg DUMMY=`date +%s` -t lomorage/amd64-lomorage .
 ```
 
 # Run

@@ -11,7 +11,9 @@ RUN apt-get update && apt-get -qy install lomo-vips
 
 RUN apt-get update && apt-get -qy install nfs-common ffmpeg util-linux rsync jq libimage-exiftool-perl avahi-utils avahi-daemon
 
-RUN apt-get update && apt-get -qy install lomo-backend-docker
+ARG DUMMY=unknown
+
+RUN DUMMY=${DUMMY} apt-get update && apt-get -qy install lomo-backend-docker
 
 RUN apt-get update && apt-get -qy install lomo-web
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
