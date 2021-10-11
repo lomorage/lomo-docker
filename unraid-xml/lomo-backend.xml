@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Lomorage</Name>
+  <Repository>lomorage/amd64-lomorage</Repository>
+  <Registry>https://hub.docker.com/r/lomorage/amd64-lomorage</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support/>
+  <Project>https://github.com/lomorage/lomo-docker</Project>
+  <Overview>Lomorage enables you to backup photos / videos from any devices to your self-hosted server, and intelligently manages these personal assets via AI. Run the Lomorage server at your home, download mobile client to save the memories, and enjoy the moments.</Overview>
+  <Category>Backup: MediaApp:Video MediaApp:Photos MediaServer:Video MediaServer:Photos Status:Stable</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon/>
+  <ExtraParams>--user=99:100</ExtraParams>
+  <PostArgs>192.168.1.28 8000 8001</PostArgs>
+  <CPUset/>
+  <DateInstalled>1633893334</DateInstalled>
+  <DonateText/>
+  <DonateLink/>
+  <Description>Lomorage enables you to backup photos / videos from any devices to your self-hosted server, and intelligently manages these personal assets via AI. Run the Lomorage server at your home, download mobile client to save the memories, and enjoy the moments.</Description>
+  <Networking>
+    <Mode>host</Mode>
+    <Publish/>
+  </Networking>
+  <Data>
+    <Volume>
+      <HostDir>/mnt/user/</HostDir>
+      <ContainerDir>/media</ContainerDir>
+      <Mode>rw</Mode>
+    </Volume>
+    <Volume>
+      <HostDir>/mnt/user/appdata/</HostDir>
+      <ContainerDir>/lomo</ContainerDir>
+      <Mode>rw</Mode>
+    </Volume>
+    <Volume>
+      <HostDir>/etc/passwd</HostDir>
+      <ContainerDir>/etc/passwd</ContainerDir>
+      <Mode>rw</Mode>
+    </Volume>
+  </Data>
+  <Environment/>
+  <Labels/>
+  <Config Name="MediaDir" Target="/media" Default="" Mode="rw" Description="Volume to store photos, videos" Type="Path" Display="always" Required="false" Mask="false">/mnt/user/</Config>
+  <Config Name="AppDir" Target="/lomo" Default="" Mode="rw" Description="Volume for application configuration and logs" Type="Path" Display="always" Required="false" Mask="false">/mnt/user/appdata/</Config>
+  <Config Name="User" Target="/etc/passwd" Default="" Mode="rw" Description="Container Path: /etc/passwd" Type="Path" Display="always" Required="false" Mask="false">/etc/passwd</Config>
+</Container>
