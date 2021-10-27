@@ -1,4 +1,4 @@
-FROM balenalib/raspberrypi3
+FROM balenalib/raspberrypi3-debian:buster
 
 RUN apt-get update && \
     apt-get -qy install ca-certificates apt-transport-https wget systemd
