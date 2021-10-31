@@ -12,8 +12,7 @@ services:
       - /dev:/dev
     ports:
       - ${LOMOD_PORT}:${LOMOD_PORT}
-      - ${LOMOW_PORT}:${LOMOW_PORT}
-    command: $HOST_ADDR $LOMOD_PORT $LOMOW_PORT
+    command: $LOMOD_PORT
 
   watchtower:
     image: ${AUTO_UPDATE_IMG}

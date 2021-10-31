@@ -17,7 +17,6 @@ ARG DUMMY=unknown
 
 RUN DUMMY=${DUMMY} apt-get update && apt-get -qy install lomo-backend-docker
 
-RUN apt-get update && apt-get -qy install lomo-web
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 COPY entry.sh /usr/bin/entry.sh

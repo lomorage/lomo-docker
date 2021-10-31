@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:focal-20201106
+FROM amd64/ubuntu:focal-20211006
 
 RUN apt-get update && \
     apt-get -qy install ca-certificates apt-transport-https wget systemd gnupg2
@@ -19,7 +19,6 @@ ARG DUMMY=unknown
 
 RUN DUMMY=${DUMMY} apt-get update && apt-get -qy install sudo lomo-backend-docker
 
-RUN apt-get update && apt-get -qy install lomo-web
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 COPY entry.sh /usr/bin/entry.sh

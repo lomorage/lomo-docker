@@ -7,7 +7,6 @@ AUTOUPDATE=0
 HOME_MEDIA_DIR=/media
 HOME_LOMO_DIR=/home/"$USER"/lomo
 LOMOD_HOST_PORT=8000
-LOMOW_HOST_PORT=8001
 IMAGE_NAME="lomorage/raspberrypi-lomorage:latest"
 AUTO_UPDATE_IMG="containrrr/watchtower:armhf-latest"
 VLAN_NAME="lomorage"
@@ -25,9 +24,7 @@ Command line options:
     -n  NETWORK_INF network interface of the host network(like eth0), required when using vlan
     -t  VLAN_TYPE   vlan type, can be \"macvlan\" or \"ipvlan\", required when using vlan
     -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required when using vlan
-    -h  HOST        IP address or hostname of the host machine, required when NOT using vlan
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to \"$LOMOD_HOST_PORT\", optional
-    -P  LOMOW_PORT  lomo-web service port exposed on host machine, default to \"$LOMOW_HOST_PORT\", optional
     -i  IMAGE_NAME  docker image name, for example \"lomorage/raspberrypi-lomorage:[tag]\", default \"$IMAGE_NAME\", optional
     -d              Debug mode to run in foreground, default to $DEBUG, optional
     -u              Auto upgrade lomorage docker images, default to $DEBUG, optional
@@ -89,12 +86,12 @@ while true; do
             LOMOD_HOST_PORT=$2
             shift 2
             ;;
-        -P)
-            LOMOW_HOST_PORT=$2
-            shift 2
-            ;;
         -i)
             IMAGE_NAME=$2
+            shift 2
+            ;;
+        -P)
+            echo "WARNING: -P is deprecated, lomo-web and lomod use the same port now"
             shift 2
             ;;
         -s)
@@ -126,7 +123,7 @@ while true; do
             shift
             ;;
         -h)
-            HOST=$2
+            echo "WARNING:-h is deprecated, lomo-web is now integrated with lomod"
             shift 2
             ;;
         --)
@@ -147,8 +144,7 @@ if [ "$VLAN_TYPE" != "ipvlan" ] && [ "$VLAN_TYPE" != "macvlan" ] && [ ! -z "$VLA
     help
 fi
 
-echo "lomo-backend host port: $LOMOW_HOST_PORT"
-echo "lomo-web host port: $LOMOD_HOST_PORT"
+echo "lomo-backend host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
 
@@ -182,26 +178,23 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
     if [ $DEBUG -eq 0 ]; then
         sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage \
-                $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+                $IMAGE_NAME $LOMOD_HOST_PORT
     else
         sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage \
-                $IMAGE_NAME $VLAN_ADDR $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+                $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 else
-    [ -z "$HOST" ] && echo "Host required!" && help
-    echo "Host: $HOST"
-
     mkdir -p "$HOME_MEDIA_DIR"
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT \
+        sudo docker run --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
-                --name=lomorage $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+                --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT -p $LOMOW_HOST_PORT:$LOMOW_HOST_PORT \
+        sudo docker run --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
-                --name=lomorage $IMAGE_NAME $HOST $LOMOD_HOST_PORT $LOMOW_HOST_PORT
+                --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 fi
