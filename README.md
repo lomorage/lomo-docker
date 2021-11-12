@@ -55,6 +55,12 @@ You have two options:
 
 ## Option 1
 
+use run.sh, download it first:
+
+```
+wget https://raw.githubusercontent.com/lomorage/lomo-docker/master/run.sh
+```
+
 You can specify the media home directory and lomo directory(**make sure to use absolute directory here**), otherwise it will use the default, you **MUST** specify the host.
 
 ```
