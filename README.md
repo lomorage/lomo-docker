@@ -80,6 +80,7 @@ Command line options:
     -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required when using vlan
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to "8000", optional
     -i  IMAGE_NAME  docker image name, for example "lomorage/raspberrypi-lomorage:[tag]", default "lomorage/raspberrypi-lomorage:latest", optional
+    -e  ENV_FILE    environment variable file passed into container, optional
     -d              Debug mode to run in foreground, default to 0, optional
     -u              Auto upgrade lomorage docker images, default to 0, optional
 
@@ -93,6 +94,14 @@ Examples:
 
 You can add the command in "/etc/rc.local" before "exit 0" to make it run automatically after system boot.
 
+You can use environment variables in the container by using env file, if you use `-e  ENV_FILE`. 
+
+For example you can have the following in the env file to customize the webpage footer.
+
+```
+LOMOW_FOOT_HTML="<a href=\"https://beian.miit.gov.cn\">粤ICP备168xxxxxxx号</a>"
+```
+
 ## Option 2
 
 You can use docker compose, if you are on OSX or Windows, use "[docker-compose.yml](docker-compose.yml)", if you are on Linux, you can use "[docker-compose.vlan.yml](docker-compose.vlan.yml)" with which MDNS works.
@@ -104,6 +113,14 @@ docker-compose up
 
 # on Linux
 sudo docker-compose -f docker-compose.vlan.yml up
+```
+
+You can use [environment variables](https://docs.docker.com/compose/environment-variables/#the-env_file-configuration-option) in the container with docker compose as well.
+
+For example you can have the following in the env file to customize the webpage footer.
+
+```
+LOMOW_FOOT_HTML="<a href=\"https://beian.miit.gov.cn\">粤ICP备168xxxxxxx号</a>"
 ```
 
 # Update dockerhub

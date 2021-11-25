@@ -26,6 +26,7 @@ Command line options:
     -a  VLAN_ADDR   vlan address to be used(like 192.168.1.99), required when using vlan
     -p  LOMOD_PORT  lomo-backend service port exposed on host machine, default to \"$LOMOD_HOST_PORT\", optional
     -i  IMAGE_NAME  docker image name, for example \"lomorage/raspberrypi-lomorage:[tag]\", default \"$IMAGE_NAME\", optional
+    -e  ENV_FILE    environment variable file passed into container, optional
     -d              Debug mode to run in foreground, default to $DEBUG, optional
     -u              Auto upgrade lomorage docker images, default to $DEBUG, optional
 
@@ -63,7 +64,7 @@ function abspath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
-OPTIONS=m:,b:,i:,p:,P:,s:,g:,n:,a:,t:,h:,d,u
+OPTIONS=m:,b:,i:,e:,p:,P:,s:,g:,n:,a:,t:,h:,d,u
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
     echo "getopt error"
@@ -88,6 +89,10 @@ while true; do
             ;;
         -i)
             IMAGE_NAME=$2
+            shift 2
+            ;;
+        -e)
+            ENV_FILE=$2
             shift 2
             ;;
         -P)
@@ -144,6 +149,12 @@ if [ "$VLAN_TYPE" != "ipvlan" ] && [ "$VLAN_TYPE" != "macvlan" ] && [ ! -z "$VLA
     help
 fi
 
+if [ -z "$ENV_FILE" ]; then
+    ENV_FILE_OPTION=""
+else
+    ENV_FILE_OPTION="--env-file $ENV_FILE"
+fi
+
 echo "lomo-backend host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
@@ -176,11 +187,11 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
+        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage \
                 $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
+        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage \
                 $IMAGE_NAME $LOMOD_HOST_PORT
     fi
@@ -189,11 +200,11 @@ else
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
+        sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
+        sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
