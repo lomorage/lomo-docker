@@ -5,7 +5,7 @@ RUN apt-get update && \
 
 RUN wget -qO - https://raw.githubusercontent.com/lomoware/lomoware.github.io/master/debian/gpg.key | sudo apt-key add -
 
-RUN echo "deb https://lomoware.github.io/debian/buster buster main" | sudo tee /etc/apt/sources.list.d/lomoware.list
+RUN echo "deb https://lomoware.lomorage.com/debian/buster buster main" | sudo tee /etc/apt/sources.list.d/lomoware.list
 
 RUN apt-get update && apt-get -qy install lomo-vips
 
