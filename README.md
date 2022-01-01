@@ -33,6 +33,12 @@ If using arm:
 sudo docker pull lomorage/raspberrypi-lomorage:latest
 ```
 
+If using arm64:
+
+```
+sudo docker pull lomorage/arm64-lomorage:latest
+```
+
 If using x86/amd64:
 
 ```
@@ -44,6 +50,9 @@ sudo docker pull lomorage/amd64-lomorage:latest
 ```
 # build for arm
 sudo docker build --build-arg DEBIAN_FRONTEND=noninteractive --build-arg DUMMY=`date +%s` -t lomorage/raspberrypi-lomorage .
+
+# build for arm64
+sudo docker build -f Dockerfile.arm64 --build-arg DEBIAN_FRONTEND=noninteractive --build-arg DUMMY=`date +%s` -t lomorage/arm64-lomorage .
 
 # build for x86/amd64
 sudo docker build -f Dockerfile.amd64 --build-arg DEBIAN_FRONTEND=noninteractive --build-arg DUMMY=`date +%s` -t lomorage/amd64-lomorage .
@@ -132,6 +141,13 @@ arm:
 ```
 sudo docker tag lomorage/raspberrypi-lomorage:latest lomorage/raspberrypi-lomorage:latest
 sudo docker push lomorage/raspberrypi-lomorage:latest
+```
+
+arm64:
+
+```
+sudo docker tag lomorage/arm64-lomorage:latest lomorage/arm64-lomorage:latest
+sudo docker push lomorage/arm64-lomorage:latest
 ```
 
 x86/amd64:
