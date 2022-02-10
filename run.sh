@@ -4,7 +4,8 @@ set -x
 
 DEBUG=0
 AUTOUPDATE=0
-HOME_MEDIA_DIR=/media
+HOME_MEDIA_DIR=/media/primary
+HOME_MEDIA_BAKUP_DIR=
 HOME_LOMO_DIR=/home/"$USER"/lomo
 LOMOD_HOST_PORT=8000
 IMAGE_NAME="lomorage/raspberrypi-lomorage:latest"
@@ -17,8 +18,9 @@ You can use either use macvlan or ipvlan which makes MDNS service discovery work
 But macvlan and ipvlan are only support on Linux, so if you are on Windows or Mac, you can't use it.
 
 Command line options:
-    -m  DIR         Absolute path of media directory used for media assets, default to \"$HOME_MEDIA_DIR\", optional
-    -b  DIR         Absolute path of lomo directory used for db and log files, default to \"$HOME_LOMO_DIR\", optional
+    -m  DIR         path of media directory used for media assets, default to \"$HOME_MEDIA_DIR\", optional
+    -k  DIR         path of media backup directory used for media assets, default to \"$HOME_MEDIA_BAKUP_DIR\", optional
+    -b  DIR         path of lomo directory used for db and log files, default to \"$HOME_LOMO_DIR\", optional
     -s  SUBNET      Subnet of the host network(like 192.168.1.0/24), required when using vlan
     -g  GATEWAY     gateway of the host network(like 192.168.1.1), required when using vlan
     -n  NETWORK_INF network interface of the host network(like eth0), required when using vlan
@@ -39,7 +41,7 @@ Examples:
 "
 
 function help() {
-    echo "`basename $0` [-m {media-dir} -b {lomo-dir} -d -u -p {lomod-port} -P {lomow-port} -i {image-name}] -t vlan-type -s subnet -g gateway -n network-interface -a vlan-address"
+    echo "`basename $0` [-m {media-dir} -k {backup-dir} -b {lomo-dir} -d -u -p {lomod-port} -P {lomow-port} -i {image-name}] -t vlan-type -s subnet -g gateway -n network-interface -a vlan-address"
     echo "$COMMAND_LINE_OPTIONS_HELP"
     exit 3;
 }
@@ -64,7 +66,7 @@ function abspath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
-OPTIONS=m:,b:,i:,e:,p:,P:,s:,g:,n:,a:,t:,h:,d,u
+OPTIONS=m:,k:,b:,i:,e:,p:,P:,s:,g:,n:,a:,t:,h:,d,u
 PARSED=$(getopt $OPTIONS $*)
 if [ $? -ne 0 ]; then
     echo "getopt error"
@@ -77,6 +79,10 @@ while true; do
     case "$1" in
         -m)
             HOME_MEDIA_DIR=$(abspath $2)
+            shift 2
+            ;;
+        -k)
+            HOME_MEDIA_BAKUP_DIR=$(abspath $2)
             shift 2
             ;;
         -b)
@@ -155,8 +161,13 @@ else
     ENV_FILE_OPTION="--env-file $ENV_FILE"
 fi
 
+if [ -z "$HOME_MEDIA_BAKUP_DIR" ]; then
+    HOME_MEDIA_BAKUP_DIR=$LOMOD_HOST_PORT
+fi
+
 echo "lomo-backend host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
+echo "Media backup directory: $HOME_MEDIA_BAKUP_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
 
 if [ "$IMAGE_NAME" != "lomorage/raspberrypi-lomorage:latest" ]; then
@@ -184,28 +195,30 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
     fi
 
     mkdir -p "$HOME_MEDIA_DIR"
+    mkdir -p "$HOME_MEDIA_BAKUP_DIR"
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
-                --name=lomorage \
-                $IMAGE_NAME $LOMOD_HOST_PORT
+        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL \
+                -v /dev:/dev -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" --rm \
+                --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -v /dev:/dev -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" --rm \
-                --name=lomorage \
-                $IMAGE_NAME $LOMOD_HOST_PORT
+        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL \
+                -v /dev:/dev -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" --rm \
+                --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 else
     mkdir -p "$HOME_MEDIA_DIR"
+    mkdir -p "$HOME_MEDIA_BAKUP_DIR"
     mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
         sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
-                -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
+                -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
         sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
-                -v "$HOME_MEDIA_DIR:/media" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
+                -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 fi

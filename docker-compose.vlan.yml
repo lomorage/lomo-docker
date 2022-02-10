@@ -7,7 +7,8 @@ services:
     cap_add:
       - ALL
     volumes:
-      - ${HOME_MEDIA_DIR}:/media
+      - ${HOME_MEDIA_DIR}:/media/primary
+      - ${HOME_MEDIA_BAKUP_DIR}:/media/backup
       - ${HOME_LOMO_DIR}:/lomo
       - /dev:/dev
     ports:
