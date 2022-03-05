@@ -112,6 +112,12 @@ For example you can have the following in the env file (check "[lomod.env](lomod
 LOMOW_FOOT_HTML=<a href=https://beian.miit.gov.cn>粤ICP备168xxxxxxx号</a>
 ```
 
+Or you can disable disk mount monitor is having some problem when monitoring the disk status
+
+```
+LOMOD_DISABLE_MOUNT_MONITOR=1
+```
+
 ## Option 2
 
 You can use docker compose, if you are on OSX or Windows, use "[docker-compose.yml](docker-compose.yml)", if you are on Linux, you can use "[docker-compose.vlan.yml](docker-compose.vlan.yml)" with which MDNS works.
@@ -131,6 +137,12 @@ For example you can have the following in the env file to customize the webpage 
 
 ```
 LOMOW_FOOT_HTML="<a href=\"https://beian.miit.gov.cn\">粤ICP备168xxxxxxx号</a>"
+```
+
+Or you can disable disk mount monitor is having some problem when monitoring the disk status
+
+```
+LOMOD_DISABLE_MOUNT_MONITOR=1
 ```
 
 # Update dockerhub
