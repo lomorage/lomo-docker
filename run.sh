@@ -161,14 +161,19 @@ else
     ENV_FILE_OPTION="--env-file $ENV_FILE"
 fi
 
-if [ -z "$HOME_MEDIA_BAKUP_DIR" ]; then
-    HOME_MEDIA_BAKUP_DIR=$LOMOD_HOST_PORT
-fi
-
 echo "lomo-backend host port: $LOMOD_HOST_PORT"
 echo "Media directory: $HOME_MEDIA_DIR"
 echo "Media backup directory: $HOME_MEDIA_BAKUP_DIR"
 echo "Lomo directory: $HOME_LOMO_DIR"
+
+mkdir -p "$HOME_MEDIA_DIR"
+mkdir -p "$HOME_LOMO_DIR"
+
+MAP_MEDIA_PARAMS="-v $HOME_MEDIA_DIR:/media/primary"
+if [ -n "$HOME_MEDIA_BAKUP_DIR" ]; then
+    mkdir -p "$HOME_MEDIA_BAKUP_DIR"
+    MAP_MEDIA_PARAMS="-v $HOME_MEDIA_DIR:/media/primary -v $HOME_MEDIA_BAKUP_DIR:/media/backup"
+fi
 
 if [ "$IMAGE_NAME" != "lomorage/raspberrypi-lomorage:latest" ]; then
     AUTO_UPDATE_IMG="containrrr/watchtower"
@@ -194,31 +199,24 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
         createMacVlan $SUBNET $GATEWAY $NETWORK_INF
     fi
 
-    mkdir -p "$HOME_MEDIA_DIR"
-    mkdir -p "$HOME_MEDIA_BAKUP_DIR"
-    mkdir -p "$HOME_LOMO_DIR"
 
     if [ $DEBUG -eq 0 ]; then
         sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL \
-                -v /dev:/dev -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" --rm \
+                -v /dev:/dev $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
         sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL \
-                -v /dev:/dev -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" --rm \
+                -v /dev:/dev $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 else
-    mkdir -p "$HOME_MEDIA_DIR"
-    mkdir -p "$HOME_MEDIA_BAKUP_DIR"
-    mkdir -p "$HOME_LOMO_DIR"
-
     if [ $DEBUG -eq 0 ]; then
         sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
-                -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
+                $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
         sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
-                -v "$HOME_MEDIA_DIR:/media/primary" -v "$HOME_MEDIA_BAKUP_DIR:/media/backup" -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
+                $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 fi
