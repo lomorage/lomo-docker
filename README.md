@@ -6,6 +6,8 @@
 - [Run](#run)
 - [Update dockerhub](#update-dockerhub)
 
+Please follow step2 at https://lomosw.lomorage.com/en/index.html to initialize the systeam and create users once you have lomo-docker setup successfully.
+
 # Install docker
 
 Please follow [instruction](https://docs.docker.com/engine/install/) on docker offical site to install docker
