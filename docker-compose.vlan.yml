@@ -4,6 +4,8 @@ services:
     image: ${IMG}
     container_name: lomorage
     privileged: true
+    environment:
+      - LOMOD_DISABLE_MOUNT_MONITOR=1
     cap_add:
       - ALL
     volumes:
