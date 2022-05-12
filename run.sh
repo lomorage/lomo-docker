@@ -201,21 +201,21 @@ if [ "$VLAN_TYPE" == "ipvlan" ] || [ "$VLAN_TYPE" == "macvlan" ]; then
 
 
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL \
+        sudo docker run -e LOMOD_DISABLE_MOUNT_MONITOR $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL \
                 -v /dev:/dev $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL \
+        sudo docker run -e LOMOD_DISABLE_MOUNT_MONITOR $ENV_FILE_OPTION --net $VLAN_NAME --ip $VLAN_ADDR --user=$UID:$(id -g $USER) --privileged --cap-add=ALL \
                 -v /dev:/dev $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
 else
     if [ $DEBUG -eq 0 ]; then
-        sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
+        sudo docker run -e LOMOD_DISABLE_MOUNT_MONITOR $ENV_FILE_OPTION --user=$UID:$(id -g $USER) -d --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     else
-        sudo docker run $ENV_FILE_OPTION --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
+        sudo docker run -e LOMOD_DISABLE_MOUNT_MONITOR $ENV_FILE_OPTION --user=$UID:$(id -g $USER) --privileged --cap-add=ALL -p $LOMOD_HOST_PORT:$LOMOD_HOST_PORT \
                 $MAP_MEDIA_PARAMS -v "$HOME_LOMO_DIR:/lomo" -v /dev:/dev --rm \
                 --name=lomorage $IMAGE_NAME $LOMOD_HOST_PORT
     fi
