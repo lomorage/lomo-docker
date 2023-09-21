@@ -125,7 +125,7 @@ LOMOD_DISABLE_MOUNT_MONITOR=1
 You can use docker compose, if you are on OSX or Windows, use "[docker-compose.yml](docker-compose.yml)", if you are on Linux, you can use "[docker-compose.vlan.yml](docker-compose.vlan.yml)" with which MDNS works.
 Make sure to modify "[.env](.env)" in your env.
 
-You can remove line `- ${HOME_MEDIA_BAKUP_DIR}:/media/backup` if you don't want to set backup directory.
+You can remove line `- ${HOME_MEDIA_BAKUP_DIR}:/media/backup` if you don't want to set backup directory. The default data directory in Docker is "/media/primary", make sure you choose this when you launching Lomorage APP on phone the first time.
 
 ```
 # on OSX or Windows
