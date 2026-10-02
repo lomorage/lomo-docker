@@ -1,3 +1,6 @@
+# Empty unless overridden with --build-context debs=<dir>.
+FROM scratch AS debs
+
 FROM amd64/debian:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +22,13 @@ ENV SUDO_USER=root
 
 ARG DUMMY=unknown
 
-RUN DUMMY=${DUMMY} apt-get update && apt-get -qy install lomo-backend-docker && rm -rf /var/lib/apt/lists/*
+# Installs lomo-backend-docker from the apt repo, or from a local .deb when built with
+# --build-context debs=<dir> (release.sh does, so a release doesn't wait on the CDN).
+RUN --mount=type=bind,from=debs,target=/debs \
+    set -e; DUMMY=${DUMMY}; apt-get update; \
+    deb=$(ls /debs/lomo-backend-docker_*_$(dpkg --print-architecture).deb 2>/dev/null | tail -1 || true); \
+    apt-get -qy install ${deb:-lomo-backend-docker}; \
+    rm -rf /var/lib/apt/lists/*
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 

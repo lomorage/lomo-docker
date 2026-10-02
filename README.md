@@ -151,25 +151,11 @@ LOMOD_DISABLE_MOUNT_MONITOR=1
 
 # Update dockerhub
 
-Retag and then push:
-
-arm:
-
-```
-sudo docker tag lomorage/raspberrypi-lomorage:latest lomorage/raspberrypi-lomorage:latest
-sudo docker push lomorage/raspberrypi-lomorage:latest
-```
-
-arm64:
+Images are released together with lomod: lomo-backend's `scripts/release-all.sh` (the `docker`
+platform) runs `release.sh`, which builds all three images from that release's
+lomo-backend-docker debs, checks lomod starts in each, and pushes them. To run it by hand:
 
 ```
-sudo docker tag lomorage/arm64-lomorage:latest lomorage/arm64-lomorage:latest
-sudo docker push lomorage/arm64-lomorage:latest
-```
-
-x86/amd64:
-
-```
-sudo docker tag lomorage/amd64-lomorage:latest lomorage/amd64-lomorage:latest
-sudo docker push lomorage/amd64-lomorage:latest
+./release.sh <lomo-backend>/releases <version>            # build, test, push
+./release.sh <lomo-backend>/releases <version> --no-push  # build and test only
 ```
